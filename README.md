@@ -10,8 +10,17 @@ clone the repo and install the dependencies
 ```bash
 yarn install
 yarn serve
-``
+```
 
-### Links
+* All Generate Logic In File  `src/wallet/index.js`
 
-- [DMC](https://dmctech.io)
+### App Demo Site
+
+http://dmctool.tsl123.com 
+
+
+  
+### dependencies
+
+* eosjs-ecc
+* vue-table-to-excel
