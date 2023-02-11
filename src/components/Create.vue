@@ -21,6 +21,14 @@
     </div>
 
     <hr>
+
+    <div v-if="error.length > 0">
+      <h3>Error</h3>
+      <ul>
+        <li class="error" v-for="err in error" :key="err">{{ err }}</li>
+      </ul>
+    </div>
+
     <div v-if="results.length > 0">
       <h3>
         Wallet Results : ( {{ results.length }} )
@@ -59,31 +67,29 @@ export default {
   data () {
     return {
       account: '',
-      total: 0,
+      total: 1,
       results: [],
       creating: false,
-      error: null
+      error: []
     }
   },
   methods: {
      generateWallet: async function () {
-        this.error = null
+        this.error = []
 
         if (this.total > 100) {
-          this.error = 'Total must be less than 100'
-          return
+            this.error.push('Total must less than 100')
+            return
         }
 
         this.creating = true
         this.results = []
         for (let i = 0; i < this.total; i++) {
           let wallet = await createWallet(this.account).catch(err => {
-            this.error = err.message
-            return null
+              this.error.push(err.message);
           })
           if (!wallet) {
-            this.creating = false
-            return
+            continue
           }
           
           this.results.push(wallet)
@@ -109,6 +115,10 @@ export default {
 
 .pb-2 {
   padding-bottom: 0.5rem;
+}
+
+.error {
+  color: red;
 }
 
 .block {

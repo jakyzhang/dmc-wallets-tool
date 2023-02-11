@@ -31,7 +31,7 @@ async function isAccountExist(account) {
     return await fetch(url, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify(data)
     }).then(async res => {
@@ -66,10 +66,13 @@ async function createWallet(account) {
         account = randomAccountName(account)
     }
 
-    if(await isAccountExist(account)) {
-        throw new Error('account already exist:',account)
+    //only check account exist not in browser,because it will cause CORS error
+    if(typeof window === 'undefined') {
+        if(await isAccountExist(account)) {
+            throw new Error('account already exist:',account)
+        }
     }
-    
+
     let wallet = await generateWalletKeyPair(account);
 
     let url = 'http://scontract.dmctech.io:32121/1.0/app/token/create'
@@ -86,13 +89,16 @@ async function createWallet(account) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
-    })
+    }).catch(err => {
+        throw new Error(`${wallet.account} create failed:` ,err)
+    });
 
     let result = await res.json()
     if(result && result.message == 'success') {
         return wallet
     } else {
-        throw new Error('create wallet failed:',result)
+        var msg = result && result.error ? `Err-${result.code} ${result.error}`: 'unknown error'
+        throw new Error(`${wallet.account} : ${msg}`);
     }
 }
 
